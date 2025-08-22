@@ -3,8 +3,8 @@ import React from "react";
 type Props = {};
 const Loading = (props: Props) => {
   return (
-    <div className="h-screen flex justify-center items-center">
-        <Loader state={true}>Loading...</Loader>
+    <div className= "h=screen flex justify-centeritems-center">
+        <Loader state={true}> ...Loading</Loader>
     </div>
   );
 };
