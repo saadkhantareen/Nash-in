@@ -37,3 +37,4 @@ next-env.d.ts
 
 # crush directory
 .crush/
+/lib/generated/prisma

@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  userId String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clerkId String @unique
+  email String @unique 
+  firstname String? @unique 
+  lastname String? @unique
+  createdAt DateTime @default(now()) 
+  subscription Subscription?
+  automations Automation[]
+  integerations Integeration[]
+
+
+
+}
+
+model Subscription{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique @db.Uuid
+  createdAt DateTime @default(now()) 
+  plan SUBSRIPTION_PLAN @default(FREE)
+  updatedAt DateTime default(now())
+  customerId String? @unique
+
+}
+
+model Automation{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @default("Untitled")
+  createdAt DateTime @default(now()) 
+  active Boolean @default(flase)
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique @db.Uuid
+  trigger Trigger[]
+  listener Listner?
+  posts POST[]
+  dms DMS[]
+  keywords Keyword[]
+}
+
+model Integeration{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name INTEGERATIONS @default(INSTAGRAM)
+  createdAt DateTime @default(now()) 
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique @db.Uuid
+  token String @unique
+  expiresAt DateTime?
+  instagramId String? @unique
+}
+
+model Listner{
+  automadtionId String @unique @db.Uuid
+  listener LISTNERS @default(MESSAGE)
+  prompt String
+  commentReply String?
+  dmCount Int @default(0)
+  commentCount Int @default(0)
+}
+
+model Trigger{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type String
+  Automation Automation? @relation(fields: [automadtionId], references: [id], onDelete: Cascade)
+  automadtionId String? @db.Uuid
+}
+
+model Keyword{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  word String
+  Automation Automation? @relation(fields: [automadtionId], references: [id], onDelete: Cascade)
+  automadtionId String? @db.Uuid
+
+  @@unique([automadtionId, word])
+}
+
+model Dms{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Automation Automation? @relation(fields: [automadtionId], references: [id], onDelete: Cascade)
+  automadtionId String? @db.Uuid
+  createdAt DateTime @default(now()) 
+  senderId String?
+  reciever String?
+  message String?
+}
+
+model Post{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postid String
+  caption String?
+  media String
+  mediaType MEDIATYPE @default(IMAGE)
+  Automation Automation? @relation(fields: [automadtionId], references: [id], onDelete: Cascade)
+  automadtionId String? @db.Uuid
+}
+enum SUBSRIPTION_PLAN{
+  PRO 
+  FREE
+}
+
+enum INTEGERATIONS{
+  INSTAGRAM
+}
+
+enum MEDIATYPE{
+  IMAGE
+  VIDEO
+  CAROSEL_ALBUM
+}
+enum LISTNERS{
+  SMARTAI
+  MESSAGE
+}
